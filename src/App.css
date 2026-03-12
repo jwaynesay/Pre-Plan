@@ -1,0 +1,708 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem 3rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: max(3rem, env(safe-area-inset-bottom));
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 600;
+  color: var(--sage-dark);
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.tagline {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.main {
+  flex: 1;
+}
+
+.card {
+  background: var(--warm-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 2rem 1.75rem;
+  border: 1px solid rgba(122, 155, 138, 0.15);
+}
+
+.search-card {
+  margin-bottom: 2rem;
+}
+
+.question {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  text-align: center;
+  margin: 0 0 1.5rem;
+}
+
+.service-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.service-btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--stone);
+  background: var(--cream);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.service-btn:hover {
+  border-color: var(--sage-light);
+  background: rgba(157, 181, 168, 0.2);
+}
+
+.service-btn.active {
+  background: var(--sage);
+  border-color: var(--sage);
+  color: var(--warm-white);
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-row.two-inputs {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.form-row label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.input-state {
+  max-width: 14rem;
+}
+
+.input-group {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.input-or {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  align-self: center;
+  padding-bottom: 0.35rem;
+}
+
+.search-form input,
+.search-form select {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--stone);
+  background: var(--warm-white);
+  color: var(--text-primary);
+}
+
+.search-form input::placeholder {
+  color: #aaa;
+}
+
+.search-form input:focus,
+.search-form select:focus {
+  outline: none;
+  border-color: var(--sage);
+  box-shadow: 0 0 0 2px rgba(122, 155, 138, 0.2);
+}
+
+.search-btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--sage-dark);
+  color: var(--warm-white);
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.search-btn:hover:not(:disabled) {
+  background: var(--charcoal);
+}
+
+.search-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Results */
+.results-section {
+  margin-top: 1.5rem;
+}
+
+.loading,
+.empty-results {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  background: var(--warm-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.results-disclaimer {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.85rem;
+  background: rgba(122, 155, 138, 0.08);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--sage-light);
+}
+
+.results-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin: 0 0 1.25rem;
+}
+
+/* Featured / sponsored advertising box */
+.featured-section {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 2px solid var(--sage);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(122, 155, 138, 0.06) 0%, var(--warm-white) 100%);
+  outline: 1px solid var(--sage-light);
+  outline-offset: 2px;
+}
+
+.featured-heading {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--sage-dark);
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.featured-ad-wrap {
+  margin-bottom: 1rem;
+  min-height: 90px;
+}
+
+.featured-ad-placeholder {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(122, 155, 138, 0.08);
+  border: 1px dashed var(--sage-light);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.featured-ad-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.featured-ad-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.35rem 0 0;
+}
+
+.featured-list {
+  gap: 1rem;
+}
+
+.featured-card {
+  border-color: rgba(122, 155, 138, 0.35);
+  background: var(--warm-white);
+}
+
+.featured-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.featured-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--cream);
+}
+
+.business-name-bold {
+  font-weight: 700;
+}
+
+.sponsored-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.business-services {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(122, 155, 138, 0.06);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--sage-light);
+}
+
+.business-services strong {
+  color: var(--charcoal);
+}
+
+.more-options-heading {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin: 1rem 0 0.75rem;
+}
+
+.spreading-cta-wrap {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--stone);
+}
+
+.spreading-cta-btn {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--sage);
+  background: var(--warm-white);
+  color: var(--sage-dark);
+  cursor: pointer;
+  width: 100%;
+  max-width: 320px;
+  display: block;
+  margin: 0 auto;
+  transition: background 0.2s, color 0.2s;
+}
+
+.spreading-cta-btn:hover:not(:disabled) {
+  background: var(--sage);
+  color: var(--warm-white);
+}
+
+.spreading-cta-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spreading-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--stone);
+}
+
+.spreading-section-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin: 0 0 1rem;
+}
+
+.results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.result-card {
+  background: var(--warm-white);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(122, 155, 138, 0.12);
+}
+
+.business-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin: 0 0 0.5rem;
+}
+
+.business-address,
+.business-city-state,
+.business-type,
+.business-distance {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.35rem;
+}
+
+.business-type {
+  font-weight: 500;
+  color: var(--sage-dark);
+}
+
+.business-links {
+  margin: 0.75rem 0 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.link-phone {
+  color: var(--link-phone);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.link-phone:hover {
+  text-decoration: underline;
+}
+
+.link-website {
+  color: var(--link-website);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.link-website:hover {
+  text-decoration: underline;
+}
+
+.business-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.meta-item.price {
+  color: var(--sage-dark);
+  font-weight: 500;
+}
+
+.price-source {
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Bottom ad banner (AdMob/AdSense) */
+.bottom-ad-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--warm-white);
+  border-top: 1px solid var(--stone);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.bottom-ad-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+  padding: 8px 36px 8px 12px;
+}
+
+.bottom-ad-unit {
+  min-height: 50px;
+  min-width: 320px;
+  max-width: 100%;
+}
+
+.bottom-ad-dismiss {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-ad-dismiss:hover {
+  background: var(--stone);
+  color: var(--charcoal);
+}
+
+.footer {
+  margin-top: 3rem;
+  padding-top: 0;
+}
+
+.footer-separator {
+  height: 0;
+  border-top: 1px solid var(--stone);
+  margin-bottom: 1rem;
+}
+
+.footer-footnote {
+  text-align: left;
+  padding-bottom: 1rem;
+}
+
+.footer-copyright {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.footer-legal-link {
+  text-decoration: underline;
+  color: var(--text-secondary);
+}
+
+.footer-legal-link:hover {
+  color: var(--sage-dark);
+}
+
+/* Contact page */
+.contact-main {
+  padding-top: 0.5rem;
+}
+
+.contact-card {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.contact-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin: 0 0 1rem;
+}
+
+.contact-intro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.25rem;
+}
+
+.contact-form {
+  margin: 1rem 0;
+}
+.contact-form .form-row {
+  margin-bottom: 1rem;
+}
+.contact-form input,
+.contact-form textarea {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--stone);
+  background: var(--warm-white);
+  color: var(--text-primary);
+}
+.contact-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--sage);
+}
+.contact-submit {
+  margin-top: 0.5rem;
+}
+.contact-success {
+  font-size: 0.95rem;
+  color: var(--sage-dark);
+  margin: 0 0 1rem;
+}
+.contact-error {
+  font-size: 0.9rem;
+  color: #b54;
+  margin: 0 0 1rem;
+}
+.contact-email-line {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 1rem 0 0;
+}
+.contact-email-link {
+  font-weight: 500;
+  color: var(--link-website);
+  text-decoration: none;
+}
+
+.contact-email-link:hover {
+  text-decoration: underline;
+}
+
+.contact-back {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.contact-back-link {
+  color: var(--sage-dark);
+  text-decoration: none;
+}
+
+.contact-back-link:hover {
+  text-decoration: underline;
+}
+
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Legal Notice page */
+.legal-main {
+  padding-top: 0.5rem;
+}
+
+.legal-card {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.legal-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  margin: 0 0 0.25rem;
+}
+
+.legal-updated {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+.legal-section {
+  margin-bottom: 1.25rem;
+}
+
+.legal-section h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin: 0 0 0.5rem;
+}
+
+.legal-section p {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.legal-email-link,
+.legal-inline-link {
+  color: var(--sage-dark);
+  text-decoration: none;
+}
+
+.legal-email-link:hover,
+.legal-inline-link:hover {
+  text-decoration: underline;
+}
+
+.legal-back {
+  margin: 1.5rem 0 0;
+  font-size: 0.9rem;
+}
+
+.legal-back-link {
+  color: var(--sage-dark);
+  text-decoration: none;
+}
+
+.legal-back-link:hover {
+  text-decoration: underline;
+}
