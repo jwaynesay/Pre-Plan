@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import axios from 'axios'
-import { MOCK_BUSINESSES, SPREADING_AND_SEA } from '../mockData.js'
 
 const router = Router()
 const GOOGLE_KEY = process.env.GOOGLE_MAPS_API_KEY
@@ -18,6 +17,7 @@ function parseAddressComponents(components) {
 }
 
 async function geocodeZip(zipCode) {
+  if (!GOOGLE_KEY) return null
   const { data } = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
     params: { address: zipCode, key: GOOGLE_KEY },
   })
@@ -73,34 +73,21 @@ async function placeDetails(placeId) {
   }
 }
 
-function mockSearch(serviceType, zipCode, radiusMiles) {
-  const list = MOCK_BUSINESSES[serviceType] || []
-  const maxResults = Math.min(8, Math.max(3, Math.floor(radiusMiles / 15)))
-  const withIds = list.slice(0, maxResults).map((b, i) => ({
-    id: `${serviceType}-${zipCode}-${i}`,
-    ...b,
-  }))
-  return [...withIds.filter((b) => b.featured), ...withIds.filter((b) => !b.featured)]
-}
-
-/** POST /api/search - body: { serviceType, zipCode, radiusMiles } */
+/** POST /api/search - body: { serviceType, zipCode, radiusMiles }. Uses Google Places only; returns [] if no key or error. */
 router.post('/search', async (req, res) => {
   try {
     const { serviceType, zipCode, radiusMiles } = req.body || {}
     if (!serviceType || !zipCode || radiusMiles == null) {
       return res.status(400).json({ error: 'Missing serviceType, zipCode, or radiusMiles' })
     }
-    const radiusM = Math.min(radiusMiles * MILES_TO_METERS, MAX_RADIUS_METERS)
-
     if (!GOOGLE_KEY) {
-      const list = mockSearch(serviceType, String(zipCode).trim(), Number(radiusMiles))
-      return res.json(list)
+      return res.json([])
     }
 
+    const radiusM = Math.min(radiusMiles * MILES_TO_METERS, MAX_RADIUS_METERS)
     const geo = await geocodeZip(String(zipCode).trim())
     if (!geo) {
-      const list = mockSearch(serviceType, String(zipCode).trim(), Number(radiusMiles))
-      return res.json(list)
+      return res.json([])
     }
 
     let type = 'funeral_home'
@@ -124,25 +111,50 @@ router.post('/search', async (req, res) => {
     res.json(places)
   } catch (err) {
     console.error('Search error:', err.message)
-    const { serviceType, zipCode, radiusMiles } = req.body || {}
-    const list = mockSearch(serviceType || 'mortuary', String(zipCode || '').trim(), Number(radiusMiles || 20))
-    res.json(list)
+    res.json([])
   }
 })
 
-/** POST /api/spreading - body: { zipCode } - spreading of ashes & burials at sea within ~500 mi (mock or Places) */
+/** POST /api/spreading - body: { zipCode }. Uses Google Places text search for ash scattering / burials at sea; returns [] if no key or no results. */
 router.post('/spreading', async (req, res) => {
   try {
-    const zipCode = req.body?.zipCode ? String(req.body.zipCode).trim() : ''
-    const withIds = SPREADING_AND_SEA.map((b, i) => ({
-      id: `spreading-${zipCode}-${i}`,
-      ...b,
-    }))
-    const list = [...withIds.filter((b) => b.featured), ...withIds.filter((b) => !b.featured)]
-    res.json(list)
+    const zipCode = (req.body?.zipCode || '').trim()
+    if (!GOOGLE_KEY) return res.json([])
+
+    const geo = await geocodeZip(zipCode || '90210')
+    if (!geo) return res.json([])
+
+    const queries = ['ash scattering memorial', 'burial at sea', 'cremation scattering']
+    const seenIds = new Set()
+    const places = []
+
+    for (const query of queries) {
+      const { data } = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
+        params: {
+          query: `${query} ${geo.lat},${geo.lng}`,
+          key: GOOGLE_KEY,
+        },
+      })
+      if (data.status !== 'OK' || !data.results?.length) continue
+      for (let i = 0; i < Math.min(4, data.results.length); i++) {
+        const p = data.results[i]
+        if (seenIds.has(p.place_id)) continue
+        seenIds.add(p.place_id)
+        const detail = await placeDetails(p.place_id)
+        if (!detail) continue
+        const dist = distanceMiles(geo.lat, geo.lng, p.geometry.location.lat, p.geometry.location.lng)
+        places.push({
+          id: `spreading-${zipCode}-${places.length}`,
+          ...detail,
+          distance: `${dist} mi`,
+          businessType: query.includes('sea') ? 'Burials at sea' : 'Spreading of ashes',
+        })
+      }
+    }
+    res.json(places.slice(0, 15))
   } catch (err) {
     console.error('Spreading error:', err.message)
-    res.json(SPREADING_AND_SEA.map((b, i) => ({ id: `spreading-${i}`, ...b })))
+    res.json([])
   }
 })
 
