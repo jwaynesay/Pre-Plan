@@ -8,7 +8,7 @@ const SERVICE_TYPES = [
   { id: 'cemetery', label: 'Burials' },
 ]
 
-const RADIUS_OPTIONS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+const RADIUS_OPTIONS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200]
 
 function getLogoUrl(business) {
   if (business.logoUrl) return business.logoUrl
@@ -23,6 +23,8 @@ function getLogoUrl(business) {
 
 export default function HomePage() {
   const [serviceType, setServiceType] = useState(null)
+  const [city, setCity] = useState('')
+  const [stateCode, setStateCode] = useState('')
   const [zipCode, setZipCode] = useState('')
   const [radius, setRadius] = useState(20)
   const [results, setResults] = useState([])
@@ -44,8 +46,10 @@ export default function HomePage() {
     e.preventDefault()
     setSearchError(null)
     setSearched(true)
-    if (!serviceType || !zipCode?.trim()) {
-      setSearchError('Please select a service type (Mortuary, Cremation, or Burials) and enter your ZIP Code.')
+    const hasZip = Boolean(zipCode?.trim())
+    const hasCityState = Boolean(city?.trim() && stateCode?.trim())
+    if (!serviceType || (!hasZip && !hasCityState)) {
+      setSearchError('Please select a service type and enter either City + State, ZIP Code, or both.')
       setResults([])
       return
     }
@@ -56,6 +60,8 @@ export default function HomePage() {
       const list = await searchServices({
         serviceType,
         zipCode: zipCode.trim(),
+        city: city.trim(),
+        state: stateCode.trim(),
         radiusMiles: radius,
       })
       setResults(list)
@@ -67,14 +73,22 @@ export default function HomePage() {
     }
   }
 
-  const locationLabel = zipCode?.trim() ? `ZIP ${zipCode.trim()}` : 'your location'
+  const locationLabel = [
+    city?.trim() ? city.trim() : null,
+    stateCode?.trim() ? stateCode.trim().toUpperCase() : null,
+    zipCode?.trim() ? `ZIP ${zipCode.trim()}` : null,
+  ].filter(Boolean).join(' • ') || 'your location'
 
   const handleSpreadingOfAshesClick = async () => {
-    if (!zipCode?.trim()) return
+    if (!zipCode?.trim() && !(city?.trim() && stateCode?.trim())) return
     setSpreadingOfAshesLoading(true)
     setSpreadingOfAshesResults([])
     try {
-      const list = await getSpreadingOfAshesAndBurialsAtSea(zipCode.trim())
+      const list = await getSpreadingOfAshesAndBurialsAtSea({
+        zipCode: zipCode.trim(),
+        city: city.trim(),
+        state: stateCode.trim(),
+      })
       setSpreadingOfAshesResults(list)
       setTimeout(() => spreadingSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
     } catch {
@@ -107,16 +121,36 @@ export default function HomePage() {
             ))}
           </div>
           <form onSubmit={handleSearch} className="search-form">
-            <div className="form-row">
-              <label htmlFor="zip">ZIP Code</label>
-              <input
-                id="zip"
-                type="text"
-                inputMode="numeric"
-                placeholder="e.g. 90210"
-                value={zipCode}
-                onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-              />
+            <div className="location-choice-wrap">
+              <div className="form-row">
+                <label htmlFor="city">City, State</label>
+                <input
+                  id="city"
+                  type="text"
+                  placeholder="City"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+                <input
+                  id="state"
+                  type="text"
+                  placeholder="State (e.g. CA)"
+                  value={stateCode}
+                  onChange={(e) => setStateCode(e.target.value.replace(/[^a-z]/gi, '').slice(0, 2).toUpperCase())}
+                />
+              </div>
+              <div className="location-or">Or</div>
+              <div className="form-row">
+                <label htmlFor="zip">ZIP Code</label>
+                <input
+                  id="zip"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="e.g. 90210"
+                  value={zipCode}
+                  onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                />
+              </div>
             </div>
             <div className="form-row">
               <label htmlFor="radius">Radius</label>
@@ -140,13 +174,10 @@ export default function HomePage() {
               <div className="loading">Finding options near {locationLabel}…</div>
             ) : results.length === 0 ? (
               <div className="empty-results">
-                <p>No results found for your area. Try a larger radius or a different ZIP code.</p>
+                <p>No results found for your area. Try a larger radius or a different location.</p>
               </div>
             ) : (
               <>
-                <p className="results-disclaimer">
-                  Sample results for demonstration. In a full version, real businesses would be shown from your area.
-                </p>
                 <h2 className="results-title">
                   {SERVICE_TYPES.find((s) => s.id === serviceType)?.label} near {locationLabel}
                 </h2>

@@ -8,7 +8,11 @@ export async function searchServices(params) {
   return Array.isArray(list) ? list : []
 }
 
-export async function getSpreadingOfAshesAndBurialsAtSea(zipCode) {
-  const list = await apiSpreading({ zipCode: (zipCode || '').trim() })
+export async function getSpreadingOfAshesAndBurialsAtSea(location) {
+  const list = await apiSpreading({
+    zipCode: (location?.zipCode || '').trim(),
+    city: (location?.city || '').trim(),
+    state: (location?.state || '').trim(),
+  })
   return Array.isArray(list) ? list : []
 }

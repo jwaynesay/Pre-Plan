@@ -97,6 +97,19 @@
   gap: 1.25rem;
 }
 
+.location-choice-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.location-or {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
 .form-row {
   display: flex;
   flex-direction: column;
