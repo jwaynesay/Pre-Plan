@@ -27,12 +27,7 @@ The `server/` folder contains the API. Endpoints: **POST /api/search** (`service
 
 ## Production search
 
-The app currently uses **mock data** so it runs without any API keys. For real business results, integrate:
-
-- **Google Places API (New)** — Nearby Search with `includedTypes`: `funeral_home`, or text search for “cremation” / “cemetery”. Use Geocoding to turn city/ZIP into lat/lng, then search with radius in meters.
-- Run the Places API from a **backend** (e.g. Node/Express) to avoid exposing your API key and to handle CORS.
-
-Replace or extend the logic in `src/services/searchService.js` with your backend client or server-side calls.
+Search runs through the **backend** (`server/`) using the **Google Maps Geocoding API** and **Places API**. Set `GOOGLE_MAPS_API_KEY` in `server/.env` (never commit the real key). The frontend calls `/api/search` and `/api/spreading` (proxied in dev by Vite).
 
 ## Selling ads in the Featured section (Google AdMob / AdSense)
 
@@ -69,3 +64,23 @@ Backend use of the **AdMob API** (reporting, managing inventory): `npm install @
 npm run build
 npm run preview   # optional: preview production build
 ```
+
+## Deploying (Cloudflare + blank page fixes)
+
+A **blank white page** after deploy usually means the browser loaded `index.html` but **JavaScript bundles failed** (404 / wrong path) or a **runtime error** occurred before React painted.
+
+The HTTPS redirect in `server/index.js` only runs when `NODE_ENV=production` and does **not** apply to local `npm run dev`. It is not a typical cause of a blank page.
+
+### Cloudflare Pages (static)
+
+1. **Build command:** `npm run build`
+2. **Output directory:** `dist`
+3. The repo includes `public/_redirects` so all routes rewrite to `index.html` (required for React Router). After build, `dist/_redirects` must be present—do not delete it in your build settings.
+
+### Subpath hosting (e.g. GitHub Pages project site)
+
+If the app is not at the domain root, set `VITE_BASE_PATH` before build (see `.env.example`) so asset URLs resolve correctly.
+
+### Node server (Express)
+
+Set `NODE_ENV=production`, run `npm run build` at the repo root, then start the server from `server/` so it can serve `../dist`.
