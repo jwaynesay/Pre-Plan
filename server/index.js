@@ -36,14 +36,6 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true })
 })
 
-if (process.env.NODE_ENV === 'production') {
-  const dist = join(__dirname, '..', 'dist')
-  app.use(express.static(dist))
-  app.get('*', (req, res) => {
-    res.sendFile(join(dist, 'index.html'))
-  })
-}
-
 app.listen(PORT, () => {
   console.log(`Pre-Plan server running at http://localhost:${PORT}`)
 })
