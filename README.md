@@ -27,7 +27,17 @@ The `server/` folder contains the API. Endpoints: **POST /api/search** (`service
 
 ## Production search
 
-Search runs through the **backend** (`server/`) using the **Google Maps Geocoding API** and **Places API**. Set `GOOGLE_MAPS_API_KEY` in `server/.env` (never commit the real key). The frontend calls `/api/search` and `/api/spreading` (proxied in dev by Vite).
+Search runs through the **backend** (`server/`) using the **Google Maps Geocoding API** and **Places API**. Set `GOOGLE_MAPS_API_KEY` in `server/.env` (never commit the real key).
+
+- **Local dev:** Vite proxies `/api` to `http://localhost:3001`, so the frontend can call `/api/search` with no extra config.
+- **Cloudflare Pages (pre-plan.org):** Pages only hosts **static files**. Your Express API is **not** running there. You must:
+  1. **Deploy the `server/` app** somewhere that runs Node 24/20 (e.g. [Render](https://render.com), [Railway](https://railway.app), [Fly.io](https://fly.io)) with `GOOGLE_MAPS_API_KEY` set in that host’s environment.
+  2. Use an **HTTPS** URL for the API (e.g. `https://api.pre-plan.org` or `https://pre-plan-api.onrender.com`).
+  3. In **Cloudflare Pages → your project → Settings → Environment variables**, add:
+     - **`VITE_API_URL`** = that API origin **with no trailing slash** (example: `https://api.pre-plan.org`).
+  4. **Redeploy** the Pages site so Vite embeds `VITE_API_URL` into the build.
+
+Without `VITE_API_URL`, the browser tries to call `/api/search` on `pre-plan.org`, which does not exist → search fails.
 
 ## Selling ads in the Featured section (Google AdMob / AdSense)
 

@@ -66,7 +66,15 @@ export default function HomePage() {
       })
       setResults(list)
     } catch (err) {
-      setSearchError('Something went wrong. Please try again.')
+      console.error(err)
+      const missingApi =
+        import.meta.env.PROD &&
+        !(import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim())
+      setSearchError(
+        missingApi
+          ? 'Search isn’t available yet: the public site needs the backend API. In Cloudflare Pages, set environment variable VITE_API_URL to your deployed API URL (https://…), then redeploy. See README.'
+          : 'Something went wrong. Please try again.',
+      )
       setResults([])
     } finally {
       setLoading(false)
